@@ -1,0 +1,70 @@
+# importing libraries
+import time
+import sys
+import numpy as np
+import pyaudio
+import matplotlib.pyplot as plt
+
+# callback function
+def callback(in_data, frame_count, time_info, status):
+    inverted = invert(in_data)
+    return (inverted, pyaudio.paContinue)
+
+# inverting function
+def invert(data):
+    intwave = np.fromstring(data, np.int32)
+    intwave = intwave * (-1)
+    inverted = np.frombuffer(intwave,np.byte)
+    return inverted
+
+# defining PyAudio object
+pa = pyaudio.PyAudio()
+
+CHUNK = 1
+CHANNELS = 2
+WIDTH = 2
+SAMPLE_RATE = 44100
+
+""" stream = pa.open(format=pa.get_format_from_width(2),
+                channels=1 if sys.platform == 'darwin' else 2,
+                rate=44100,
+                input=True,
+                output=True,
+                stream_callback=callback) """
+
+length = 1
+t = np.arange(0,length, 1.0/SAMPLE_RATE) 
+
+def sinwave(frequency):
+    x = np.pi*2*frequency*t 
+    signal = np.sin(x)
+    signal = signal * (-1)
+    #signal = np.roll(signal,int((phase_change) * SAMPLE_RATE / (2 * np.pi)))
+    return signal
+
+def plot(signal):
+    plt.plot(t,signal)
+    plt.show()
+
+def invertg(data):
+    g = np.invert(data)
+    return g
+
+# defining main method
+def main():
+    wawe = sinwave(1)
+    plot(wawe)
+    start = time.time()
+    DURATION = 10
+
+    while stream.is_active() and (time.time() - start) < DURATION:
+        time.sleep(0.1)
+
+    stream.close()
+    pa.terminate()
+
+
+
+# execution
+if __name__ == "__main__":
+    main()
